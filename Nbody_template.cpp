@@ -1,3 +1,6 @@
+/*
+ * Template for the Nbody simuilation excercise
+ */
 
 #include<iostream>
 #include <fstream>
@@ -6,6 +9,14 @@
 #include <iomanip>
 
 #define TYPE double
+
+/*
+ *  Task 1:
+ *  Write a generic struct for a vector
+ *  Add a function to compute the vector's norm
+ *  Add a constructor which initializes the vector to zero
+ *  Overload the operators + and - for a second vector and the operator * for multplication with a scalar
+ */
 
 struct vector
 {
@@ -37,6 +48,14 @@ std::ostream& operator<<(std::ostream& out, vector& v) {
     out << std::setw(width) << std::setprecision(precision) << v.z;
     return out;
 }
+
+/*
+ * Task 2:
+ * Write a function to compute the force for each body using a direct sum
+ * Write a function to compute the velocity for each body
+ * Write a funktion to update the new positions of a each body
+ */
+
 
 class Nbody
 {
