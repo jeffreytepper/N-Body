@@ -137,6 +137,8 @@ velocities.resize(n);
 std::fill(velocities.begin(), velocities.end(), vector());
 velocitiesOld.resize(n);
 std::fill(velocitiesOld.begin(), velocitiesOld.end(), vector());
+forces.resize(n);
+std::fill(forces.begin(), forces.end(), vector());
 
 for (int i = 0; i < n; ++i) {
             ifs >> masses[i] >> positions[i] >> velocities[i];
