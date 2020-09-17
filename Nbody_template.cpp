@@ -1,26 +1,9 @@
-/*
-Template for the Nbody simuilation excercise
-Copyright (C) 2019  Patrick Diehl
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 #include<iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <iomanip>
+#include <cmath>
 
 #define TYPE double
 
@@ -31,23 +14,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *  Add a constructor which initializes the vector to zero
  *  Overload the operators + and - for a second vector and the operator * for multplication with a scalar
  */
-
 struct vector
 {
     
     double x,y,z;
     
-        bool operator==(const vector& rhs) const {
-        return x == rhs.x
-            && y == rhs.y
-            && z == rhs.z;
+    vector(): x(0.0), y(0.0), z(0.0){};
+    
+    bool operator==(const vector& rhs) const {
+    return x == rhs.x
+        && y == rhs.y
+        && z == rhs.z;
+    }
+    
+    vector operator+ (const vector& rhs) const {
+        vector v;
+        v.x = this-> x + rhs.x;
+        v.y = this-> y + rhs.y;
+        v.z = this-> z + rhs.z;
+        return v;
+    }
+    
+    vector operator- (const vector& rhs) const {
+        vector v;
+        v.x = this-> x - rhs.x;
+        v.y = this-> y - rhs.y;
+        v.z = this-> z - rhs.z;
+        return v;
+    }
+    
+    vector operator* (const double& sc) const {
+        vector v;
+        v.x = this-> x * sc;
+        v.y = this-> y * sc;
+        v.z = this-> z * sc;
+        return v;
+    }
+    
+    double norm(){
+        return std::sqrt(x*x + y*y + z*z);
     }
 
     friend std::istream& operator>>(std::istream&, vector&);
     friend std::ostream& operator<<(std::ostream&, vector&);
 };
 
-extern "C++" 
+extern "C++"
 std::istream& operator>>(std::istream& in, vector& v) {
     return in >> v.x >> v.y >> v.z;
 }
@@ -90,16 +102,33 @@ public:
 size_t timeSteps;
 
 //Method to compute the acceleration
-void computeForces(){}
+void computeForces(){
+    vector sum = vector();
+    for(size_t i = 0; i < n; i++){
+        for(size_t j = 0; j < n; i++){
+            if(i != j){
+                sum = sum + (positions[j] - positions[i]) * ((1 / std::pow((positions[j] - positions[i]).norm(),3)) * (gc * masses[j]));
+            }
+        }
+        forces[i] = sum;
+        sum = vector();
+    }
+}
 
 //Method to compute the velocity
 void computeVelocities(){
-    
+    for(size_t i = 0; i < n; i++){
+        velocities[i] = velocitiesOld[i] + forces[i] * (1/masses[i]) * timeStepSize;
+    }
      std::copy(velocities.begin(),velocities.end(),velocitiesOld.begin());
 }
 
 //Method to update the positions
-void updatePositions(){}
+void updatePositions(){
+    for(size_t i = 0; i < n; i++){
+        positions[i] = positions[i] + velocities[i] * timeStepSize;
+    }
+}
 
 //Method to detect collisions between bodys
 void detectCollisions(){
@@ -117,7 +146,7 @@ void detectCollisions(){
 public:
 
 //Constructor
-Nbody(std::string& fileName) { 
+Nbody(std::string& fileName) {
 
 std::ifstream ifs(fileName);
         if (!ifs.is_open()) {
@@ -175,21 +204,21 @@ std::ostream& operator<<(std::ostream& out, Nbody& nb) {
 int main(){
 
 std::string fileName = "nbody.txt";
+    
+    Nbody nb(fileName);
 
+    for(size_t t = 0; t < nb.timeSteps; t++){
 
-Nbody nb(fileName);
+        std::cout << std::endl << "Cycle " << t << std::endl;
+        nb.computeForces();
+        nb.computeVelocities();
+        nb.updatePositions();
+        nb.detectCollisions();
+        std::cout << nb;
 
+    }
 
-for(size_t t = 0 ; t < nb.timeSteps;t++){
-
-std::cout << std::endl << "Cycle " << t << std::endl;
-nb.computeForces();
-nb.computeVelocities();
-nb.updatePositions();
-nb.detectCollisions();
-std::cout << nb;
-
+    return EXIT_SUCCESS;
 }
 
-return EXIT_SUCCESS;
-}
+
