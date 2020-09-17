@@ -63,7 +63,7 @@ struct vector
         return v;
     }
     
-    vector operator* (const double& sc) const {
+    vector operator* (const T& sc) const {
         vector v;
         v.x = this-> x * sc;
         v.y = this-> y * sc;
